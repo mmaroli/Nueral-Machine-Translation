@@ -5,4 +5,4 @@ Dataset for translation found [here](http://www.manythings.org/anki/).
 
 ## Instructions for Use:
   1. `source venv/bin/activate`
-  2.
+  2. 

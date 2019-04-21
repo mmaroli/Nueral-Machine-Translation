@@ -16,7 +16,7 @@ class DataLoader:
         self.path_to_file = os.path.dirname(path_to_zip)+"/spa-eng/spa.txt"
 
         Preprocessor(path_to_file=self.path_to_file)
-        
+
         return self.path_to_file
 
     def load_data_from_file(self):

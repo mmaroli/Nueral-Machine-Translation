@@ -15,7 +15,7 @@ class DataLoader:
         )
         self.path_to_file = os.path.dirname(path_to_zip)+"/spa-eng/spa.txt"
 
-        Preprocessor(path_to_file=self.path_to_file)
+        preprocessor = Preprocessor(path_to_file=self.path_to_file)
 
         return self.path_to_file
 
@@ -30,7 +30,7 @@ class DataLoader:
 
     def tokenize(self, lang):
         lang_tokenizer = tf.keras.preprocessing.text.Tokenizer(filters='')
-        lang_tokenizer.fit_on_texts(lang) # creates index to word mapping 
+        lang_tokenizer.fit_on_texts(lang) # creates index to word mapping
 
         tensor = lang_tokenizer.texts_to_sequences(lang) # list of sequences
         tensor = tf.keras.preprocessing.sequence.pad_sequences(tensor, padding='post') # pads sequence to be equal lengths, returns np array

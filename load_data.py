@@ -43,6 +43,7 @@ class DataLoader:
                 print ("%d ----> %s" % (t, lang.index_word[t]))
 
     def load_dataset(self):
+        print("Loading dataset...")
         targ_lang, inp_lang = self.load_data_from_file()
         input_tensor, inp_lang_tokenizer = self.tokenize(inp_lang)
         targ_tensor, targ_lang_tokenizer = self.tokenize(targ_lang)

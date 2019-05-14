@@ -55,8 +55,8 @@ class DataLoader:
 
 
 
-
-dl = DataLoader(path_to_file='language-files/por.txt')
-input_tensor, targ_tensor, inp_lang_tokenizer, targ_lang_tokenizer = dl.load_dataset()
-dl.convert(inp_lang_tokenizer, input_tensor[0])
-dl.convert(targ_lang_tokenizer, targ_tensor[0])
+if __name__ == '__main__':
+    dl = DataLoader(path_to_file='language-files/por.txt')
+    input_tensor, targ_tensor, inp_lang_tokenizer, targ_lang_tokenizer = dl.load_dataset()
+    dl.convert(inp_lang_tokenizer, input_tensor[0])
+    dl.convert(targ_lang_tokenizer, targ_tensor[0])

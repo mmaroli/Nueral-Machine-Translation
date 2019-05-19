@@ -52,7 +52,7 @@ class Seq2Seq:
     @tf.function
     def train_step(self, inp, targ, enc_hidden):
         loss = 0
-        BATCH_SIZE = 64
+        BATCH_SIZE = self.batch_size
 
         with tf.GradientTape() as tape:
             enc_output, enc_hidden = self.encoder(inp, enc_hidden)

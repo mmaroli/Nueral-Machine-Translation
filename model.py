@@ -29,6 +29,8 @@ class Seq2Seq:
         self.checkpoint = tf.train.Checkpoint(optimizer=self.optimizer,
                                          encoder=self.encoder,
                                          decoder=self.decoder)
+        self.checkpoint.restore(tf.train.latest_checkpoint(self.checkpoint_dir))
+
 
     def create_tf_dataset(self):
         """ Creates dataset and stores in self.dataset member variable """

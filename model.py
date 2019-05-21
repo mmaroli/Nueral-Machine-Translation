@@ -1,5 +1,6 @@
 import tensorflow as tf
 from load_data import DataLoader
+from preprocess import Preprocessor
 from sklearn.model_selection import train_test_split
 import time
 import os
@@ -30,7 +31,12 @@ class Seq2Seq:
                                          encoder=self.encoder,
                                          decoder=self.decoder)
         self.checkpoint.restore(tf.train.latest_checkpoint(self.checkpoint_dir))
+        self.preprocessor = Preprocessor()
+        self.max_length_inp = self.max_length(self.input_tensor)
+        self.max_length_targ = self.max_length(self.targ_tensor)
 
+    def max_length(self, tensor):
+        return max(len(t) for t in tensor)
 
     def create_tf_dataset(self):
         """ Creates dataset and stores in self.dataset member variable """
@@ -97,6 +103,36 @@ class Seq2Seq:
 
             print(f"Epoch {epoch+1} Loss {total_loss/self.steps_per_epoch}")
             print(f"Time take for 1 epoch {time.time()-start}")
+
+    def evaluate(self, sentence):
+        units = 1024
+        sentence = self.preprocessor.preprocess(sentence)
+        inputs = [self.inp_lang_tokenizer.word_index[i] for i in sentence.split()]
+        inputs = tf.keras.preprocessing.sequence.pad_sequences([inputs], maxlen=self.max_length_inp, padding='post')
+        inputs = tf.convert_to_tensor(inputs)
+
+        result = ''
+        hidden = [tf.zeros((1,units))]
+        enc_out, enc_hidden = self.encoder(inputs, hidden)
+
+        dec_hidden = enc_hidden
+        dec_input = tf.expand_dims([self.targ_lang_tokenizer.word_index['<start>']], 0)
+
+        for t in range(self.max_length_targ):
+            predictions, dec_hidden, _ = self.decoder(dec_input, dec_hidden, enc_out)
+
+            predicted_id = tf.argmax(predictions[0]).numpy()
+
+            result += self.targ_lang_tokenizer.index_word[predicted_id] + ' '
+
+            if self.targ_lang_tokenizer.index_word[predicted_id] == '<end>':
+                return result, sentence
+
+            dec_input = tf.expand_dims([predicted_id], 0)
+
+        return result, sentence
+
+
 
 
 
@@ -241,33 +277,8 @@ if __name__ == '__main__':
 
     model = Seq2Seq(batch_size=BATCH_SIZE)
     model.create_tf_dataset()
-    # example_input_batch, example_target_batch = next(iter(model.dataset))
-    # print(example_input_batch.shape, example_target_batch.shape)
 
-    # encoder = Encoder(vocab_size=17875, embedding_dim=50, enc_units=10, batch_sz=BATCH_SIZE)
-    # sample_hidden = encoder.initialize_hidden_state()
-    # sample_output, sample_hidden = encoder(example_input_batch,sample_hidden)
-    # print(sample_output.shape, sample_hidden.shape)
-    #
-    # attention_layer = BahdanauAttention(10)
-    # attention_result, attention_weights = attention_layer(sample_hidden, sample_output)
-    # print(attention_result.shape, attention_weights.shape)
-    #
-    # decoder = Decoder(vocab_size=11424, embedding_dim=50, dec_units=10, batch_sz=BATCH_SIZE)
-    # sample_decoder_output, _, _ = decoder(tf.random.uniform((64,1)), sample_hidden, sample_output)
-    # print(sample_decoder_output.shape)
-
-
-    # # Optimizer and Loss Function
-    # optimizer = tf.keras.optimizers.Adam()
-    # loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
-    #     from_logits=True, reduction='none'
-    # )
-    # # Checkpoints
-    # checkpoint_dir = './training_checkpoints'
-    # checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
-    # checkpoint = tf.train.Checkpoint(optimizer=optimizer,
-    #                                  encoder=encoder,
-    #                                  decoder=decoder)
-
-    model.train()
+    # model.train()
+    result, sentence = model.evaluate("Olá como vai você")
+    print(f"Sentence: {sentence}")
+    print(f"Result: {result}")

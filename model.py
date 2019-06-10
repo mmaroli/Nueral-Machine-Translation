@@ -273,7 +273,7 @@ def train():
 
 
 if __name__ == '__main__':
-    BATCH_SIZE=256
+    BATCH_SIZE=64
 
     model = Seq2Seq(batch_size=BATCH_SIZE)
     model.create_tf_dataset()
